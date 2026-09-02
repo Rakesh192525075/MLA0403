@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AegisMobile DBN-IDS | Mobile Intrusion Detection System</title>
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <sidebar>
+            <div>
+                <div class="brand">
+                    <div class="brand-logo">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="brand-info">
+                        <h2>AegisMobile</h2>
+                        <span>DBN-IDS Platform</span>
+                    </div>
+                </div>
+                
+                <ul class="nav-links">
+                    <li>
+                        <a class="nav-item active" data-tab="dashboard">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span>SOC Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-tab="architecture">
+                            <i class="fa-solid fa-network-wired"></i>
+                            <span>DBN Architecture</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-tab="simulator">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Training Sandbox</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-tab="analytics">
+                            <i class="fa-solid fa-chart-bar"></i>
+                            <span>Threat Analytics</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-item" data-tab="reference">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Project Thesis</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <div class="status-indicator"></div>
+                    <span>System Active (Simulated)</span>
+                </div>
+            </div>
+        </sidebar>
+
+        <!-- Main Workspace -->
+        <main>
+            <!-- Top Header -->
+            <div class="header">
+                <div class="header-title">
+                    <h1 id="view-title">SOC Dashboard</h1>
+                    <p id="view-subtitle">Real-time mobile network intrusion detection and telemetry analysis</p>
+                </div>
+                <div class="header-actions">
+                    <span style="font-size: 0.85rem; color: var(--text-secondary);">
+                        <i class="fa-solid fa-server" style="color: var(--neon-cyan); margin-right: 5px;"></i>
+                        Core DBN Engine: Active
+                    </span>
+                    <button class="btn btn-primary" id="sim-trigger-btn">
+                        <i class="fa-solid fa-play"></i>
+                        <span>Start Live Traffic</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 1: SOC DASHBOARD -->
+            <div id="dashboard" class="tab-content active">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="card stat-card">
+                        <div class="stat-header">
+                            <span>Traffic Rate</span>
+                            <div class="stat-icon cyan">
+                                <i class="fa-solid fa-wave-square"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="stat-packet-rate">0 /s</div>
+                        <div class="stat-footer">Simulating active packets</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-header">
+                            <span>Total Analyzed</span>
+                            <div class="stat-icon purple">
+                                <i class="fa-solid fa-database"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="stat-total-packets">0</div>
+                        <div class="stat-footer">Packets fed to DBN</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-header">
+                            <span>Threats Blocked</span>
+                            <div class="stat-icon pink">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="stat-threats-detected">0</div>
+                        <div class="stat-footer up" id="threat-footer-percentage"><span>0.0%</span> anomaly rate</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-header">
+                            <span>DBN Confidence</span>
+                            <div class="stat-icon green">
+                                <i class="fa-solid fa-square-check"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="stat-confidence">98.4%</div>
+                        <div class="stat-footer">Post fine-tuning accuracy</div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Column 1: Live Logs -->
+                    <div class="card terminal-card">
+                        <div class="card-title">
+                            <span><i class="fa-solid fa-terminal" style="color: var(--neon-cyan); margin-right: 8px;"></i>Analyzed Packet Stream (DBN Feed)</span>
+                            <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">Real-time predictions</span>
+                        </div>
+                        <div class="log-stream" id="logStream">
+                            <div class="log-line normal">
+                                <div class="log-meta">
+                                    <span class="log-timestamp">[SYSTEM INITIALIZATION]</span>
+                                    <span class="log-tag normal">INFO</span>
+                                </div>
+                                <div class="log-msg">Mobile IDS loaded. Press "Start Live Traffic" to stream test scenarios.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Gauges & Controls -->
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div class="card">
+                            <div class="card-title">
+                                <span>Threat Index</span>
+                            </div>
+                            <div class="metric-ring-container">
+                                <div class="gauge-canvas-wrapper">
+                                    <canvas id="gaugeCanvas" width="200" height="130"></canvas>
+                                    <div class="gauge-label">
+                                        <div class="gauge-val" id="gaugeValue">0%</div>
+                                        <div class="gauge-title" id="gaugeStatus">NORMAL</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">
+                                <span>Select Simulation Scenario</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="scenarioSelect">Attack Profile</label>
+                                <select id="scenarioSelect" class="form-control">
+                                    <option value="normal">Normal Baseline Traffic</option>
+                                    <option value="imsi">IMSI Catcher MitM (RAN Attack)</option>
+                                    <option value="smishing">SMS Phishing Campaign (Payload Anomaly)</option>
+                                    <option value="ddos">Diameter Signaling Flood (DoS)</option>
+                                    <option value="mixed">Mixed Random Environment</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 0.5rem;" id="apply-scenario-btn">
+                                <i class="fa-solid fa-shuffle"></i> Inject Scenario
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: DBN ARCHITECTURE VISUALIZER -->
+            <div id="architecture" class="tab-content">
+                <div class="architecture-container">
+                    <!-- Column 1: Interactive Canvas -->
+                    <div class="canvas-wrapper">
+                        <canvas id="networkCanvas"></canvas>
+                        <div class="canvas-instructions">
+                            <i class="fa-solid fa-circle-info"></i> Click on any network layer or neuron to inspect its parameters.
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Parameters Panel -->
+                    <div class="layer-details-panel">
+                        <div class="card">
+                            <div class="card-title">
+                                <span id="layer-details-title">System Overview</span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;" id="layer-details-desc">
+                                The DBN model consists of stacked Restricted Boltzmann Machines (RBMs) followed by a Softmax fine-tuning layer. Click on a layer on the left to see node activations and weights.
+                            </p>
+                            
+                            <div class="layer-stat-row">
+                                <span class="layer-stat-label">Layer Type:</span>
+                                <span class="layer-stat-value" id="detail-layer-type">Deep Belief Network</span>
+                            </div>
+                            <div class="layer-stat-row">
+                                <span class="layer-stat-label">Total Neurons:</span>
+                                <span class="layer-stat-value" id="detail-layer-neurons">92 Nodes</span>
+                            </div>
+                            <div class="layer-stat-row">
+                                <span class="layer-stat-label">Active State:</span>
+                                <span class="layer-stat-value" style="color: var(--neon-green);" id="detail-layer-status">Forward-feeding</span>
+                            </div>
+                            <div class="layer-stat-row">
+                                <span class="layer-stat-label">Activation Func:</span>
+                                <span class="layer-stat-value" id="detail-layer-activation">Sigmoid / Softmax</span>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">
+                                <span>Weight Matrix Sample</span>
+                            </div>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">Visualizing weights connecting input to layer. Brightness represents weight magnitude.</p>
+                            <div class="weight-heatmap" id="weightHeatmap">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: TRAINING SANDBOX -->
+            <div id="simulator" class="tab-content">
+                <div class="simulator-layout">
+                    <!-- Sandbox Config Panel -->
+                    <div class="card">
+                        <div class="card-title">
+                            <span>DBN Hyperparameters</span>
+                        </div>
+                        <div class="form-group">
+                            <label>RBM Stack Depth (Hidden Layers)</label>
+                            <div class="slider-group">
+                                <input type="range" id="param-layers" min="1" max="4" value="3">
+                                <span class="slider-val" id="val-layers">3</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Layer Neurons Structure</label>
+                            <input type="text" id="param-neurons" class="form-control" value="64, 32, 16" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Learning Rate (Pre-training)</label>
+                            <div class="slider-group">
+                                <input type="range" id="param-lr" min="0.001" max="0.1" step="0.001" value="0.01">
+                                <span class="slider-val" id="val-lr">0.010</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Epochs (Contrastive Divergence)</label>
+                            <div class="slider-group">
+                                <input type="range" id="param-epochs" min="10" max="200" step="10" value="100">
+                                <span class="slider-val" id="val-epochs">100</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Activation Function</label>
+                            <select id="param-activation" class="form-control">
+                                <option value="sigmoid">Sigmoid</option>
+                                <option value="relu">ReLU</option>
+                                <option value="tanh">Tanh</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                            <button class="btn btn-primary" id="train-run-btn" style="flex-grow: 1; justify-content: center;">
+                                <i class="fa-solid fa-graduation-cap"></i> Start DBN Training
+                            </button>
+                            <button class="btn btn-secondary" id="train-reset-btn">
+                                <i class="fa-solid fa-rotate-left"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sandbox Visualization Charts -->
+                    <div style="display: flex; flex-direction: column; gap: 2rem;">
+                        <!-- Training Telemetry -->
+                        <div class="card">
+                            <div class="card-title">
+                                <span>Training Progress Monitor</span>
+                                <span id="training-phase-indicator" style="font-size: 0.85rem; color: var(--neon-yellow); font-weight: 500;">Idle</span>
+                            </div>
+                            
+                            <div class="simulation-progress-wrapper" style="margin-bottom: 1.5rem;">
+                                <div>
+                                    <div class="progress-metric">
+                                        <span>Current Stage: <strong id="train-stage-text">Unsupervised Pre-training (RBM1)</strong></span>
+                                        <span id="train-pct-text">0%</span>
+                                    </div>
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" id="trainProgressBar"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="height: 300px; position: relative;">
+                                <canvas id="trainingChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: THREAT ANALYTICS -->
+            <div id="analytics" class="tab-content">
+                <div class="analytics-grid">
+                    <!-- Column 1: Classification Performance -->
+                    <div class="card">
+                        <div class="card-title">
+                            <span>Classifier performance metrics</span>
+                        </div>
+                        <div style="height: 250px; position: relative;">
+                            <canvas id="metricsRadarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: ROC Curve -->
+                    <div class="card">
+                        <div class="card-title">
+                            <span>ROC Curve (DBN Sensitivity)</span>
+                        </div>
+                        <div style="height: 250px; position: relative;">
+                            <canvas id="rocChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-grid" style="grid-template-columns: 1fr 1fr;">
+                    <!-- Column 3: Confusion Matrix -->
+                    <div class="card">
+                        <div class="card-title">
+                            <span>Intrusion Confusion Matrix</span>
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); text-align: center; margin-bottom: 0.5rem;">
+                            Actual vs. Predicted classification counts based on current batch.
+                        </p>
+                        <div class="confusion-matrix">
+                            <!-- Matrix Header -->
+                            <div></div>
+                            <div class="matrix-header">Pred Normal</div>
+                            <div class="matrix-header">Pred Attack</div>
+
+                            <!-- Row 1 -->
+                            <div class="matrix-row-header">Act Normal</div>
+                            <div class="matrix-cell tn">
+                                <span class="matrix-cell-val" id="cm-tn">1420</span>
+                                <span class="matrix-cell-label">True Neg</span>
+                            </div>
+                            <div class="matrix-cell fp">
+                                <span class="matrix-cell-val" id="cm-fp">12</span>
+                                <span class="matrix-cell-label">False Pos</span>
+                            </div>
+
+                            <!-- Row 2 -->
+                            <div class="matrix-row-header">Act Attack</div>
+                            <div class="matrix-cell fn">
+                                <span class="matrix-cell-val" id="cm-fn">21</span>
+                                <span class="matrix-cell-label">False Neg</span>
+                            </div>
+                            <div class="matrix-cell tp">
+                                <span class="matrix-cell-val" id="cm-tp">547</span>
+                                <span class="matrix-cell-label">True Pos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 4: Threat Breakdown -->
+                    <div class="card">
+                        <div class="card-title">
+                            <span>Attack Distribution Breakdown</span>
+                        </div>
+                        <div style="height: 250px; display: flex; justify-content: center; position: relative;">
+                            <canvas id="breakdownChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: PROJECT REFERENCE THESIS -->
+            <div id="reference" class="tab-content">
+                <div class="docs-layout">
+                    <!-- Side Docs Navigation -->
+                    <div class="docs-nav">
+                        <ul class="docs-menu">
+                            <li class="docs-menu-item active"><a href="#doc-intro">Introduction</a></li>
+                            <li class="docs-menu-item"><a href="#doc-threats">Mobile Threat Vector</a></li>
+                            <li class="docs-menu-item"><a href="#doc-dbn">DBN Mathematics</a></li>
+                            <li class="docs-menu-item"><a href="#doc-architecture">System Architecture</a></li>
+                            <li class="docs-menu-item"><a href="#doc-conclusions">Thesis Conclusions</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Document Scroll Content -->
+                    <div class="docs-content">
+                        <!-- Sec 1 -->
+                        <div class="docs-section" id="doc-intro">
+                            <h2>1. Introduction</h2>
+                            <p>
+                                Mobile communication infrastructures serve as the nervous system of modern society. However, protocols like SS7, Diameter, and LTE/5G Radio Access Networks (RAN) inherit structural trust vulnerabilities. Standard signature-based security applications fail against zero-day exploits and rapid metamorphic network anomalies.
+                            </p>
+                            <p>
+                                This project implements a high-performance **Intrusion Detection System (IDS)** powered by a **Deep Belief Network (DBN)**. A DBN leverages stacks of **Restricted Boltzmann Machines (RBMs)** to conduct unsupervised greedy pre-training, extracting deep latent features representing network traffic patterns. Following unsupervised compression, backpropagation fine-tunes the network using supervised data to classify intrusions accurately.
+                            </p>
+                        </div>
+
+                        <!-- Sec 2 -->
+                        <div class="docs-section" id="doc-threats">
+                            <h2>2. Mobile Systems Vulnerabilities</h2>
+                            <p>
+                                Modern cellular devices connect automatically to local transceivers. Attack vectors targeting this architectural flow include:
+                            </p>
+                            <div>
+                                <span class="vuln-badge red">IMSI Catcher MitM</span>
+                                <span class="vuln-badge red">Diameter Signaling DoS</span>
+                                <span class="vuln-badge red">SS7 Location Tracking</span>
+                                <span class="vuln-badge red">SMS Phishing / Smishing</span>
+                                <span class="vuln-badge">Unauthenticated Cell Broadcasts</span>
+                                <span class="vuln-badge">RAN Packet Injection</span>
+                            </div>
+                            <h3 style="margin-top: 1.5rem;">IMSI Catchers (Stingrays)</h3>
+                            <p>
+                                IMSI Catchers impersonate legitimate base stations (Cell Towers) by broadcasting stronger signal parameters (large Received Signal Level offsets) and custom Area Codes. Because cellular standards prioritize signal strength, the mobile device connects to the rogue catcher. The device undergoes a Downgrade Attack (forced into unencrypted 2G modes), permitting full eavesdropping on calls, SMS payloads, and metadata tracking.
+                            </p>
+                            <h3>Signaling Attacks (SS7 / Diameter)</h3>
+                            <p>
+                                SS7 (used in 2G/3G) and Diameter (used in 4G/5G) are protocols supporting roaming and cell handovers. Malicious nodes query signaling gateways to bypass routing filters, performing subscriber location requests, intercepting SMS messages (bypassing 2FA), and launching Distributed Denial of Service (DDoS) signaling storms that exhaust telecom node memories.
+                            </p>
+                        </div>
+
+                        <!-- Sec 3 -->
+                        <div class="docs-section" id="doc-dbn">
+                            <h2>3. DBN & RBM Mathematical Formulation</h2>
+                            <p>
+                                A Restricted Boltzmann Machine (RBM) is a bipartite graphical model containing a visible layer (inputs <code>v</code>) and a hidden layer (features <code>h</code>), with zero intra-layer connections.
+                            </p>
+                            <p>
+                                The energy configuration of a state <code>(v, h)</code> is given by:
+                            </p>
+                            <div class="math-card">
+                                E(v, h) = - ∑(a_i * v_i) - ∑(b_j * h_j) - ∑∑(v_i * W_ij * h_j)
+                                <code>Energy equation of RBM configuration</code>
+                            </div>
+                            <p>
+                                Where:
+                                <ul>
+                                    <li><code>W_ij</code> is the weight linking visible unit <code>i</code> and hidden unit <code>j</code>.</li>
+                                    <li><code>a_i</code> and <code>b_j</code> are visible and hidden bias vectors.</li>
+                                </ul>
+                            </p>
+                            <h3>Unsupervised Layer-by-Layer Pre-training</h3>
+                            <p>
+                                Since visible and hidden units are conditionally independent, RBM parameters are optimized using <strong>Contrastive Divergence (CD-k)</strong>. This approximates the gradient of the log-likelihood:
+                            </p>
+                            <div class="math-card">
+                                ΔW_ij = η * ( ⟨v_i * h_j⟩_data - ⟨v_i * h_j⟩_reconstruction )
+                                <code>Contrastive Divergence learning update</code>
+                            </div>
+                            <p>
+                                By stacking RBMs, each layer's activations act as visible units for the next layer. This pre-training initializes weights in a near-optimal space, avoiding the gradient vanishing problems typical in deep feedforward backpropagation networks.
+                            </p>
+                        </div>
+
+                        <!-- Sec 4 -->
+                        <div class="docs-section" id="doc-architecture">
+                            <h2>4. System Architecture & Dataflow</h2>
+                            <p>
+                                AegisMobile IDS functions on a high-throughput, inline telemetry pipeline:
+                            </p>
+                            <div class="math-card" style="font-family: var(--font-body); font-size: 0.9rem; text-align: left;">
+                                <strong>Mobile Telemetry</strong> ➔ <strong>Feature Extractor</strong> (12-dim) ➔ <strong>Stacked RBM 1-3</strong> ➔ <strong>Backpropagation Fine-tuner</strong> ➔ <strong>SOC Alert System</strong>
+                            </div>
+                            <p>
+                                Input network packets are extracted into a 12-dimensional vector:
+                                <br>
+                                <code>[Signal_Strength, Cell_LAC, MCC, MNC, Packet_Rate, Delta_Time, Payload_Entropy, Header_Size, Message_Length, Protocol_Type, LAC_Variance, Auth_Request]</code>.
+                                The DBN processes these signals to outputs. Classification evaluates threat signatures versus baseline expectations.
+                            </p>
+                        </div>
+
+                        <!-- Sec 5 -->
+                        <div class="docs-section" id="doc-conclusions">
+                            <h2>5. Thesis Conclusions</h2>
+                            <p>
+                                1. **Robust Representation**: Stacked RBM pre-training is highly effective at clustering normal mobile signal behaviors, establishing solid baseline representation bounds.
+                                <br>
+                                2. **High Precision**: The fine-tuned DBN model achieves a classification accuracy of **98.4%** across complex attack structures, matching or outperforming standard Support Vector Machines (SVM) and Multi-Layer Perceptrons (MLP).
+                                <br>
+                                3. **Real-time Viability**: With a mean inference latency of under **4.2 milliseconds** per packet, the AegisMobile pipeline is capable of inline integration in modern telecom carrier gateways.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
